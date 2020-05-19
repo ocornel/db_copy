@@ -31,3 +31,6 @@ def main():
     prep_ubuntu()
     prep_env()
     return "Done"
+
+
+main()

@@ -1,6 +1,6 @@
-# Copy flattened table from one server to another.
+# Copy flattened table(s) from one server to another.
 
-The code in this repo will enable you copy data from a table in one server database into another table/server database. This will flatten the original table into two fields, table_name (string) and fields (jsonb) which you can later remodel using views. This transaction can happen between tables of same database, different databases, different servers etc provided you have the correct connection credentials.
+The code in this repo will enable you copy data from tables in one server database into another table/server database. This will flatten the original tables into two fields, table_name (string) and fields (jsonb) which you can later remodel using views. This transaction can happen between tables of same database, different databases, different servers etc provided you have the correct connection credentials.
   
 
 ## Setting up.  
@@ -31,7 +31,7 @@ Example local_settings.py
     S_DB_NAME = 'database'  
     S_DB_USER = 'user'  
     S_DB_PASSWORD = 'password'  
-    S_DB_TABLE = 'target_table'  
+    S_DB_TABLES = ['table1', 'table2', 'materialized_view1', 'function_routine_1()']  
       
     D_HOST = 'example2.com'  
     D_DB_NAME = 'database2'  
