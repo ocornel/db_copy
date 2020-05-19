@@ -1,3 +1,4 @@
 code/local_settings.py
 venv
 .idea
+code/__pycache__
