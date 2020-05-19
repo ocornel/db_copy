@@ -4,7 +4,7 @@ The code in this repo will enable you copy data from a table in one server datab
   
 
 ## Setting up.  
-The setup was prepared for linux ubuntu environments. You can however just figure out what the `setup.py` file does and follow manually on your OS
+The setup was prepared for linux ubuntu environments. You can however just figure out what the [setup.py](https://github.com/ocornel/db_copy/blob/master/code/setup.py) file does and implement manually on your OS
 If you are on ubuntu, 
 cd to the directory containing this `README.md` file then  
 
@@ -24,7 +24,7 @@ So you can basically do these manually if you are on a different platform.
 Once the setup is done, the usage is the same no matter the platform.
 
 ### Settings
-The code needs to know which databases to target. so create a new file `local_settings.py` in the same directory as the `settings.py` and define the constants whose values you want to override from the settings.py
+The code needs to know which databases to target. so create a new file `local_settings.py` in the same directory as the `settings.py` and define the constants whose values you want to override from the [settings.py](https://github.com/ocornel/db_copy/blob/master/code/settings.py)
 Example local_settings.py
 
     S_HOST = 'example.com'  
@@ -39,7 +39,7 @@ Example local_settings.py
     D_DB_PASSWORD = 'password2'  
     D_DB_TABLE = 'destination_table'
     D_CLEAR = True
-In this example local settings (compare with settings.py) we have maintained the ports for both db so we didn't repeat them but overiden everything else. We have instructed the app to clear the destination table by `D_CLEAR = True` on our local settings.
+In this example local settings (compare with `settings.py`) we have maintained the ports for both db so we didn't repeat them but overiden everything else. We have instructed the app to clear the destination table by `D_CLEAR = True` on our local settings.
 It's obvious that you ensure both source and destination parameters are valid lest you'll face errors.
 
 ### Running
