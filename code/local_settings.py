@@ -1,4 +1,5 @@
 import os
+S_HOST = os.environ['S_HOST']
 S_DB_NAME = os.environ['S_DB_NAME']
 S_DB_USER = os.environ['S_DB_USER'] 
 S_DB_PASSWORD = os.environ['S_DB_PASSWORD']
