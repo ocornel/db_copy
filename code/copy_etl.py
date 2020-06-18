@@ -9,17 +9,28 @@ os.environ['D_PG_PASSWORD'] = D_DB_PASSWORD
 
 SOURCE_PG_DB = DbParams(dbtype='PG', host=S_HOST, port=S_PORT, dbname=S_DB_NAME, user=S_DB_USER)
 DESTINATION_PG_DB = DbParams(dbtype='PG', host=D_HOST, port=D_PORT, dbname=D_DB_NAME, user=D_DB_USER)
+S_DB_TABLES = S_DB_TABLES
 D_TABLE = D_DB_TABLE
-
 
 def copy_src_to_dest():
     delete_sql = "DELETE FROM {0}".format(D_TABLE)  # USE THIS TO CLEAR DESTINATION FOR IDEMPOTENCE
 
     with connect(SOURCE_PG_DB, "S_PG_PASSWORD") as src_conn:
         with connect(DESTINATION_PG_DB, "D_PG_PASSWORD") as dest_conn:
+            s_tables = []
             if D_CLEAR:
                 execute(delete_sql, dest_conn)
-            for S_DB_TABLE in S_DB_TABLES:
+
+            if S_DB_TABLES == '__all__':
+                tables_query = "select tablename from pg_catalog.pg_tables where schemaname = 'public';"
+                rows = get_rows(tables_query, src_conn)
+                for row in rows:
+                    s_tables.append(row.tablename)
+
+            else:
+                s_tables = S_DB_TABLES.split(",")
+
+            for S_DB_TABLE in s_tables:
                 select_sql = "select '{0}' as table_name , row_to_json(ROW(u))::text as json from {0} u".format(
                     S_DB_TABLE)
                 insert_sql = "INSERT INTO {0} (table_name, fields) VALUES (%s, %s)".format(D_TABLE)
@@ -42,16 +53,18 @@ def create_view(view_name, src_conn=None, dest_conn=None):
     if view_count == 0:
         select_sql = "select distinct on (1) '{0}' as table_name , row_to_json(ROW(u))::text as json from {0} u order by table_name ; ".format(
             view_name)
+        rows = get_rows(select_sql, src_conn)
+        if len(rows) > 0:
+            sample_json = json.loads(rows[0].json)['f1']
+            fields = ""
+            for k, v in sample_json.items():
+                fields += "fields #>> '{f1,%s}' as %s, " % (k, k)
 
-        sample_json = json.loads(get_rows(select_sql, src_conn)[0].json)['f1']
-        fields = ""
-        for k, v in sample_json.items():
-            fields += "fields #>> '{f1,%s}' as %s, " % (k, k)
-
-        fields = fields[:-2]
-        view_sql = "create view {0} as select {1} from {2} where table_name = '{0}';".format(view_name, fields, D_TABLE)
-        execute(view_sql, dest_conn)
-        return True
+            fields = fields[:-2]
+            view_sql = "create view {0} as select {1} from {2} where table_name = '{0}';".format(view_name, fields,
+                                                                                                 D_TABLE)
+            execute(view_sql, dest_conn)
+            return True
     return False
 
 

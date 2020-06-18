@@ -31,7 +31,7 @@ Example local_settings.py
     S_DB_NAME = 'database'  
     S_DB_USER = 'user'  
     S_DB_PASSWORD = 'password'  
-    S_DB_TABLES = ['table1', 'table2', 'materialized_view1', 'function_routine_1()']  
+    S_DB_TABLES = "table1, table2, materialized_view1" # OR "__all__" if you want all tables  
       
     D_HOST = 'example2.com'  
     D_DB_NAME = 'database2'  
