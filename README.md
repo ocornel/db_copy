@@ -63,6 +63,8 @@ Destination table (dumps):
 
 These can then be restructured using view queries to any form of table you can retrieve from the data using `fields#>>'{f1,first_name}' as first_name`
 
+Update: The code now takes care of building the views in the destination database based on the source table.
+
 ##Build and run via docker
 ```docker build -t db_copy .```
 ```docker run -e S_DB_NAME='localhost' db_copy```

@@ -32,9 +32,10 @@ def copy_src_to_dest():
 def create_view(view_name, src_conn=None, dest_conn=None):
     """
     Checks if view exists before getting a sample json and creating a view based on the table_name
-    :param view_name:
-    :param sample_json:
-    :return:
+        :param view_name: table to sample from...also name of destination view to be created
+        :param dest_conn: Destination connection
+        :param src_conn: Source connection
+        :return: True if view created, false if not
     """
     count_query = "select count(*) from pg_catalog.pg_views where schemaname = 'public' and viewname = '%s';" % view_name
     view_count = get_rows(count_query, dest_conn)[0].count
@@ -50,21 +51,23 @@ def create_view(view_name, src_conn=None, dest_conn=None):
         fields = fields[:-2]
         view_sql = "create view {0} as select {1} from {2} where table_name = '{0}';".format(view_name, fields, D_TABLE)
         execute(view_sql, dest_conn)
-    return True
+        return True
+    return False
 
 
 def refresh_mat_views(dest_conn):
     """
     Checks if refresh_matviews() function is defined in destination database before calling it
-    :param dest_conn:
-    :return:
+    :param dest_conn: Destination connection
+    :return: True if materialized views refreshed, false if not.
     """
     count_query = "SELECT count(*)FROM information_schema.routines where routine_name = 'refresh_matviews';"
     counts = get_rows(count_query, dest_conn)[0].count
     if counts > 0:
         q = "select * from refresh_matviews();"
         execute(q, dest_conn)
-    return True
+        return True
+    return False
 
 
 copy_src_to_dest()
