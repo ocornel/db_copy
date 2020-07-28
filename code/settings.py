@@ -5,6 +5,7 @@ S_DB_NAME = ''
 S_DB_USER = ''
 S_DB_PASSWORD = ''
 S_DB_TABLES = ''
+S_DB_ENGINE = 'postgres'
 
 # DESTINATION PARAMS
 D_HOST = ''
