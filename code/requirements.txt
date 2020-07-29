@@ -1,2 +1,2 @@
-etlhelper==0.7.6
+etlhelper==0.8.0
 psycopg2-binary==2.8.5

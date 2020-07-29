@@ -8,6 +8,7 @@ except ImportError:
     S_DB_USER = os.environ['S_DB_USER']
     S_DB_PASSWORD = os.environ['S_DB_PASSWORD']
     S_DB_TABLES = os.environ['S_DB_TABLES'].split(",")
+    S_DB_ENGINE = os.environ['S_DB_ENGINE']
 
     D_HOST = os.environ['D_HOST']
     D_DB_NAME = os.environ['D_DB_NAME']
