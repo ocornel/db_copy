@@ -68,10 +68,18 @@ def copy_src_to_dest():
             s_tables = S_TABLES.split(",")
 
         for S_DB_TABLE in s_tables:
-            select_sql = table_select_query(S_DB_TABLE, src_conn)
-            insert_sql = table_insert_query(D_TABLE)
-            print('Copying data from %s' % S_DB_TABLE)
-            copy_rows(select_sql, src_conn, insert_sql, dest_conn)
+            record_count = get_rows("select count(*) from {0}".format(S_DB_TABLE), src_conn)[0].count
+            offset = 0
+            limit = 50000
+            print('Copying {0} records from {1}'.format(record_count, S_DB_TABLE))
+            while record_count > 0:
+                select_sql = table_select_query(S_DB_TABLE, src_conn, offset=offset, limit=limit)
+                print('Table: {} | Records remaining: {} | Limit: {} | Offset: {} '.format(S_DB_TABLE, record_count,limit, offset))
+                insert_sql = table_insert_query(D_TABLE)
+                copy_rows(select_sql, src_conn, insert_sql, dest_conn)
+                record_count -= limit
+                offset += limit
+
             create_view(S_DB_TABLE, dest_conn)
 
     refresh_mat_views(dest_conn)
@@ -87,7 +95,7 @@ def mysql_copy_src_to_dest(src_conn, s_tables, dest_conn):
         s_tables = S_TABLES.split(",")
 
     for S_DB_TABLE in s_tables:
-        select_sql = table_select_query(S_DB_TABLE, src_conn)
+        select_sql = table_select_query(S_DB_TABLE, src_conn, offset=0, limit=1000)
         print('Copying data from %s' % S_DB_TABLE)
         cursor = src_conn.cursor()
         cursor.execute(select_sql)
@@ -132,9 +140,14 @@ def get_tables_query():
     return None
 
 
-def table_select_query(table, conn):
+def table_select_query(table, conn, offset=0, limit=None):
+    if limit is None:
+        subquery = table
+    else:
+        subquery = "(select * from {0} offset {1} limit {2})".format(table, offset, limit)
     if engine == ENGINES['postgres']:
-        return "select '{0}' as table_name , row_to_json(ROW(u))::text as json from {0} u".format(table)
+
+        return "select '{0}' as table_name , row_to_json(ROW(u))::text as json from {1} u".format(table, subquery)
     elif engine == ENGINES['mysql']:
         columns_query = "SELECT COLUMN_NAME as col_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'{0}'".format(
             table)
@@ -146,8 +159,8 @@ def table_select_query(table, conn):
             field_col_pair += "'{0}', {0}, ".format(field)
 
         field_col_pair = field_col_pair[:-2]
-        select_query = "SELECT '{0}' as table_name,  JSON_OBJECT('f1', JSON_OBJECT({1})) as json FROM {0};".format(
-            table, field_col_pair)
+        select_query = "SELECT '{0}' as table_name,  JSON_OBJECT('f1', JSON_OBJECT({1})) as json FROM {2};".format(
+            table, field_col_pair, subquery)
         return select_query
     return None
 
