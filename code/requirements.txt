@@ -1,5 +1,5 @@
 etlhelper==0.8.0
-mysql-connector-python==8.0.21
+mysql-connector-python==9.1.0
 protobuf==3.12.2
 psycopg2-binary==2.8.5
 pyodbc==4.0.30
